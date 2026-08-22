@@ -81,6 +81,46 @@ Then open the web client, allow mic access, and talk to the agent. Android integ
 (`android/`) mirrors the same LiveKit connect/token flow — see its README for merging into
 the existing app.
 
+## Deploying the console
+
+Only the console is deployable to a static host. The other three components are not,
+and it matters why:
+
+| Component | Deploy target | Why not Vercel |
+|---|---|---|
+| `web/` console | **Vercel** (config in [`vercel.json`](vercel.json)) | — |
+| `backend/` token server | any container host | needs to be reachable over HTTPS; could be a serverless function with rework |
+| `livekit-agent/` worker | any container host | a persistent process that joins rooms and holds sockets for the length of a call |
+| LiveKit media server | LiveKit Cloud, or a host with TLS | WebRTC media, not HTTP |
+
+The console reads its backend address from `VITE_API_BASE` at **build** time (see
+[`web/.env.example`](web/.env.example)). Vite bakes it into the bundle, so changing it
+needs a rebuild, and it must be a public value — never a secret.
+
+```bash
+# local
+npm --prefix web run dev                       # falls back to http://localhost:8081
+
+# production build
+VITE_API_BASE=https://tokens.example.com npm --prefix web run build
+```
+
+On Vercel: import the repo, leave the build settings alone (`vercel.json` supplies the
+build command and output directory), and set `VITE_API_BASE` in the project's
+Environment Variables.
+
+### Before you point a public URL at this
+
+- **The token endpoint has no authentication.** Anyone who can reach it can mint a join
+  token for any `order_id` and sit in a live driver call. On localhost that is a known
+  gap; on a public URL it is a live one. Wire it to your app's session before deploying.
+- **`VITE_API_BASE` must be HTTPS.** The page is served over HTTPS and the browser
+  blocks plain-HTTP requests from it as mixed content.
+- **`LIVEKIT_URL` must be `wss://`,** which means a TLS-terminated media server. The
+  `--node-ip 127.0.0.1` in [`livekit-agent/docker-compose.yml`](livekit-agent/docker-compose.yml)
+  is exactly what makes local ICE work and exactly what breaks it for everyone else.
+- **Set `ALLOWED_ORIGINS`** on the token server to the deployed console's origin.
+
 ## Languages
 
 Measured against the live Sarvam APIs (Aug 2026), 12 languages, TTS->STT round-trip:

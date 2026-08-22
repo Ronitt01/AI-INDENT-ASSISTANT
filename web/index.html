@@ -82,7 +82,7 @@
     <div class="modal-content">
       <h3>Connection</h3>
       <label>API base URL
-        <input id="api-base" type="text" placeholder="http://localhost:8080" autocomplete="off" />
+        <input id="api-base" type="text" placeholder="https://your-token-server.example" autocomplete="off" />
       </label>
       <label>Operator ID
         <input id="user-id" type="text" placeholder="dispatcher-1" autocomplete="off" />
@@ -93,20 +93,15 @@
       <label>Voice stack
         <select id="voice-stack">
           <option value="livekit">LiveKit + Sarvam</option>
-          <option value="vapi">Vapi</option>
         </select>
-      </label>
-      <label>Vapi bridge URL
-        <input id="vapi-base" type="text" placeholder="http://localhost:8090" autocomplete="off" />
       </label>
       <p class="muted small">
         The browser never holds LiveKit or vendor secrets — it asks the backend for a
-        short-lived room token at call time. On the Vapi stack it holds only Vapi's
-        <em>public</em> key, fetched from the bridge.
+        short-lived room token at call time.
       </p>
       <p class="muted small">
-        The stack is chosen when the call starts. Switching takes effect on the next
-        call, not the current one.
+          Settings are saved in this browser only, and apply to the next call
+          rather than the current one.
       </p>
       <div class="modal-actions">
         <button id="settings-save" class="primary-btn">Save</button>

@@ -1,19 +1,31 @@
 // Client state. The agent owns the indent; this holds only what the browser
 // needs to render it and drive the call.
 
+// Where the token server lives. Baked in at build time from VITE_API_BASE so a
+// deployed console talks to a deployed backend; falls back to the local port for
+// `npm run dev`. A hardcoded localhost here is invisible in development and fatal
+// once deployed - the visitor's browser would dial *their own* machine.
+// An operator can still override it per-browser in the settings modal.
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8081";
+
 const DEFAULTS = {
-  apiBase: "http://localhost:8081",
+  apiBase: API_BASE,
   userId: "dispatcher-1",
   orderId: "42",
-  /** "livekit" (LiveKit + Sarvam) or "vapi". See src/transport.js. */
+  /** Only one stack now; see src/transport.js. Kept as a key for forward room. */
   voiceStack: "livekit",
-  /** The Vapi bridge service — only used when voiceStack is "vapi". */
-  vapiBase: "http://localhost:8090",
 };
 
 function loadSettings() {
   try {
-    return { ...DEFAULTS, ...JSON.parse(localStorage.getItem("indentSettings.v2") || "{}") };
+    const saved = JSON.parse(localStorage.getItem("indentSettings.v2") || "{}");
+    // Drop a saved apiBase that points at a machine this browser is not on. Without
+    // this, anyone who ever ran the console locally keeps a localhost apiBase in
+    // localStorage and the deployed site silently fails for them alone.
+    if (saved.apiBase && /localhost|127\.0\.0\.1/.test(saved.apiBase)) {
+      if (!/localhost|127\.0\.0\.1/.test(window.location.hostname)) delete saved.apiBase;
+    }
+    return { ...DEFAULTS, ...saved };
   } catch {
     return { ...DEFAULTS };
   }
@@ -21,9 +33,6 @@ function loadSettings() {
 
 export const store = {
   room: null,
-  /** Vapi client and its state socket; null on the LiveKit stack. */
-  vapi: null,
-  stateSocket: null,
   /** Transport module pinned for the duration of the current call. */
   activeStack: null,
   connected: false,

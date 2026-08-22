@@ -10,3 +10,5 @@ livekit-agent/call_logs.sqlite3-*
 web/node_modules/
 .playwright-mcp/
 *.png
+web/.env.local
+.vercel/

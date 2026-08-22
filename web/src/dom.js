@@ -5,7 +5,7 @@ const IDS = [
   "call-label", "settings-btn", "agent-speaking", "messages", "interim",
   "indent-fields", "issues", "completion-card", "progress-text", "ring-fill",
   "copy-json", "metrics-content", "settings-modal", "api-base", "user-id",
-  "order-id", "voice-stack", "vapi-base", "toast",
+  "order-id", "voice-stack", "toast",
 ];
 
 export const el = Object.fromEntries(IDS.map((id) => [id, document.getElementById(id)]));
