@@ -1,0 +1,111 @@
+/* Conversation */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message {
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  max-width: 100%;
+}
+
+.message .role {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.message.user {
+  border-color: #22304a;
+}
+
+.message.user .role { color: var(--accent); }
+
+.message .text {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.message.system {
+  border-style: dashed;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Live partial transcript — shown greyed under the feed while STT is mid-phrase */
+
+.interim {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px dashed var(--field-border);
+  color: var(--dim);
+  font-size: 14px;
+  font-style: italic;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.2s, max-height 0.2s;
+}
+
+.interim.visible {
+  opacity: 1;
+  max-height: 90px;
+}
+
+.message {
+  animation: message-in 0.28s ease-out;
+}
+
+.message .role {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.msg-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.msg-time {
+  color: var(--dim);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-lang {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #1a2436;
+  color: #7aa2e3;
+  border: 1px solid #24365e;
+  white-space: nowrap;
+}
+
+.chip-barge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #3a2f16;
+  color: var(--amber);
+  border: 1px solid #4a3a1c;
+  white-space: nowrap;
+}
+
+/* Barge-in: the caller talked over the agent */
+
+.message.barge { border-left: 2px solid var(--amber); }

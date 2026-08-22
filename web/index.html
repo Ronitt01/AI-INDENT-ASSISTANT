@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indent Assistant — Operator Console</title>
+  <!-- Inline, so there is no favicon request to 404 on every page load. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f172a'/%3E%3Cpath d='M7 21h18M7 15h13M7 9h9' stroke='%2338bdf8' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles/index.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="title">Indent Assistant</span>
+      <span class="state-pill" id="state-pill" data-state="idle">
+        <span class="state-dot"></span>
+        <span class="state-label" id="state-label">Idle</span>
+      </span>
+      <span class="call-timer" id="call-timer"></span>
+    </div>
+
+    <div class="badges">
+      <span class="badge badge-stt">STT · Sarvam</span>
+      <span class="badge badge-llm">LLM · Sarvam</span>
+      <span class="badge badge-tts">TTS · Sarvam</span>
+    </div>
+
+    <div class="topbar-right">
+      <div class="meter" id="meter" title="Agent audio level">
+        <span class="meter-bar"></span><span class="meter-bar"></span><span class="meter-bar"></span>
+        <span class="meter-bar"></span><span class="meter-bar"></span><span class="meter-bar"></span>
+        <span class="meter-bar"></span><span class="meter-bar"></span>
+      </div>
+      <button id="mute-toggle" class="mute-toggle" disabled>Mute</button>
+      <button id="call-toggle" class="call-toggle">
+        <span class="call-glyph"></span><span id="call-label">Call</span>
+      </button>
+      <button id="settings-btn" class="settings-btn" title="Connection settings">&#9881;</button>
+    </div>
+  </header>
+
+  <main class="main-grid">
+    <section class="panel conversation-panel">
+      <div class="panel-header">
+        <span>CONVERSATION</span>
+        <span class="agent-speaking-indicator hidden" id="agent-speaking">
+          <span class="dot"></span> agent speaking
+        </span>
+      </div>
+      <div class="messages" id="messages" aria-live="polite" aria-relevant="additions"></div>
+      <div class="interim" id="interim"></div>
+    </section>
+
+    <section class="panel indent-panel">
+      <div class="panel-header">
+        <span>INDENT</span>
+        <span class="header-actions">
+          <button id="copy-json" class="mini-btn">Copy JSON</button>
+          <span class="progress">
+            <svg viewBox="0 0 36 36" class="progress-ring" aria-hidden="true">
+              <circle class="ring-track" cx="18" cy="18" r="15.5"></circle>
+              <circle class="ring-fill" id="ring-fill" cx="18" cy="18" r="15.5"></circle>
+            </svg>
+            <span class="progress-text" id="progress-text">0/8</span>
+          </span>
+        </span>
+      </div>
+      <div class="indent-fields" id="indent-fields"></div>
+      <div class="issues hidden" id="issues"></div>
+      <div class="completion-card hidden" id="completion-card"></div>
+    </section>
+
+    <section class="panel metrics-panel">
+      <div class="panel-header"><span>CALL METRICS</span></div>
+      <div class="metrics-content" id="metrics-content">
+        <p class="muted">Metrics appear once the call is under way.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Connection</h3>
+      <label>API base URL
+        <input id="api-base" type="text" placeholder="http://localhost:8080" autocomplete="off" />
+      </label>
+      <label>Operator ID
+        <input id="user-id" type="text" placeholder="dispatcher-1" autocomplete="off" />
+      </label>
+      <label>Order ID
+        <input id="order-id" type="text" placeholder="42" autocomplete="off" />
+      </label>
+      <label>Voice stack
+        <select id="voice-stack">
+          <option value="livekit">LiveKit + Sarvam</option>
+          <option value="vapi">Vapi</option>
+        </select>
+      </label>
+      <label>Vapi bridge URL
+        <input id="vapi-base" type="text" placeholder="http://localhost:8090" autocomplete="off" />
+      </label>
+      <p class="muted small">
+        The browser never holds LiveKit or vendor secrets — it asks the backend for a
+        short-lived room token at call time. On the Vapi stack it holds only Vapi's
+        <em>public</em> key, fetched from the bridge.
+      </p>
+      <p class="muted small">
+        The stack is chosen when the call starts. Switching takes effect on the next
+        call, not the current one.
+      </p>
+      <div class="modal-actions">
+        <button id="settings-save" class="primary-btn">Save</button>
+        <button id="settings-close" class="ghost-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

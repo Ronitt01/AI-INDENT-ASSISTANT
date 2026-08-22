@@ -1,0 +1,18 @@
+# Local LiveKit dev server — NOT for production (devkey/secret, no TLS, no TURN).
+# For production, use LiveKit Cloud or a properly configured self-hosted deployment
+# with real credentials and a TURN server for restrictive networks.
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    # --node-ip is the IP advertised to clients for ICE. Without it the container
+    # advertises its bridge IP (172.x.x.x), which a browser on the host cannot reach —
+    # WebRTC then fails with "could not establish pc connection". Override for LAN
+    # testing (e.g. the Android app on a phone): LIVEKIT_NODE_IP=192.168.x.x docker compose up -d
+    command: --dev --bind 0.0.0.0 --node-ip ${LIVEKIT_NODE_IP:-127.0.0.1}
+    ports:
+      - "7880:7880" # HTTP / WebSocket signaling
+      - "7881:7881" # RTC TCP fallback
+      - "7882:7882/udp" # RTC UDP
+    # --dev mode ships with the devkey/secret pair already baked in — matches
+    # LIVEKIT_API_KEY/LIVEKIT_API_SECRET in ../.env.example. Don't add real
+    # credentials here; this file is for local Phase 0/1 testing only.

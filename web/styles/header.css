@@ -1,0 +1,236 @@
+/* Header */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 24px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--panel-border);
+  flex-wrap: wrap;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Call-state pill: the one place that says what the agent is doing right now */
+.state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+  font-size: 12px;
+  color: var(--muted);
+  transition: color 0.25s, border-color 0.25s;
+}
+
+.state-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.state-pill[data-state="idle"]       { color: var(--dim); }
+.state-pill[data-state="connecting"] { color: var(--amber); border-color: #4a3a1c; }
+.state-pill[data-state="listening"]  { color: var(--green); border-color: #1f4a2f; }
+.state-pill[data-state="thinking"]   { color: var(--accent); border-color: #24365e; }
+.state-pill[data-state="speaking"]   { color: var(--accent); border-color: #24365e; }
+
+.state-pill[data-state="connecting"] .state-dot,
+.state-pill[data-state="thinking"] .state-dot {
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+.state-pill[data-state="listening"] .state-dot { box-shadow: 0 0 7px currentColor; }
+.state-pill[data-state="speaking"] .state-dot {
+  animation: pulse-dot 0.6s ease-in-out infinite;
+  box-shadow: 0 0 8px currentColor;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(0.75); }
+}
+
+.call-timer {
+  font-size: 12px;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+  min-width: 38px;
+}
+
+.badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.badge-stt, .badge-tts {
+  color: var(--amber);
+  border-color: #4a3a1c;
+}
+
+.badge-llm {
+  color: var(--green);
+  border-color: #1f4a2f;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+select.lang-select {
+  background: var(--field-bg);
+  color: var(--text);
+  border: 1px solid var(--field-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+/* Live audio meter — driven by Vapi's volume-level event */
+.meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+  width: 62px;
+}
+
+.meter-bar {
+  flex: 1;
+  height: 25%;
+  background: var(--field-border);
+  border-radius: 1px;
+  transition: height 0.09s linear, background-color 0.09s linear;
+}
+
+.meter-bar.on { background: var(--accent); }
+.meter-bar:nth-child(1).on { height: 30%; }
+.meter-bar:nth-child(2).on { height: 42%; }
+.meter-bar:nth-child(3).on { height: 55%; }
+.meter-bar:nth-child(4).on { height: 68%; }
+.meter-bar:nth-child(5).on { height: 80%; }
+.meter-bar:nth-child(6).on { height: 90%; }
+.meter-bar:nth-child(7).on { height: 97%; }
+.meter-bar:nth-child(8).on { height: 100%; }
+
+.call-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--green);
+  border: 1px solid #1f4a2f;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 104px;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.call-glyph {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.call-toggle:hover { background: #1f4a2f22; }
+
+.call-toggle.active {
+  color: var(--red);
+  border-color: #7f1d1d;
+}
+
+.call-toggle.active:hover { background: #7f1d1d22; }
+
+/* A live call is a state worth noticing from across the room. */
+
+.call-toggle.active .call-glyph {
+  border-radius: 2px;
+  animation: ring-pulse 1.6s ease-out infinite;
+}
+
+@keyframes ring-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55); }
+  70%  { box-shadow: 0 0 0 9px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.mini-btn {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--field-border);
+  border-radius: 5px;
+  padding: 3px 9px;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.mini-btn:hover { color: var(--text); border-color: var(--accent); }
+
+.mute-toggle {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--field-border);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 74px;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.mute-toggle:hover:not(:disabled) { color: var(--text); }
+
+.mute-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mute-toggle.muted {
+  color: var(--amber);
+  border-color: #4a3a1c;
+  background: #4a3a1c22;
+}
+
+.settings-btn {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--field-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.settings-btn:hover { color: var(--text); }

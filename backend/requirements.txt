@@ -1,0 +1,4 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+livekit-api>=0.7
+python-dotenv>=1.0

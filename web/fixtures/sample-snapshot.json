@@ -1,0 +1,250 @@
+{
+ "callId": "demo-call",
+ "indent": {
+  "fields": {
+   "pickupLocation": {
+    "value": "Bengaluru",
+    "confidence": 3,
+    "source": "llm",
+    "term": "Bengaluru",
+    "utterance": null,
+    "at": 1786981146.7492237,
+    "history": [
+     {
+      "value": "Bengaluru",
+      "confidence": 2,
+      "source": "speech",
+      "at": 1786981146.7492237
+     }
+    ],
+    "warnings": []
+   },
+   "deliveryLocation": {
+    "value": "Mumbai",
+    "confidence": 4,
+    "source": "llm",
+    "term": "Mumbai",
+    "utterance": null,
+    "at": 1786981146.7542312,
+    "history": [
+     {
+      "value": "अंबाला",
+      "confidence": 1,
+      "source": "speech",
+      "at": 1786981146.7492237
+     },
+     {
+      "value": "Ambala",
+      "confidence": 3,
+      "source": "llm",
+      "at": 1786981146.7492237
+     }
+    ],
+    "warnings": []
+   },
+   "material": {
+    "value": "Steel",
+    "confidence": 3,
+    "source": "llm",
+    "term": "Steel",
+    "utterance": null,
+    "at": 1786981146.7502315,
+    "history": [
+     {
+      "value": "Steel",
+      "confidence": 2,
+      "source": "speech",
+      "at": 1786981146.7502315
+     }
+    ],
+    "warnings": []
+   },
+   "vehicleType": {
+    "value": "Open Body Truck",
+    "confidence": 3,
+    "source": "llm",
+    "term": "Open Body Truck",
+    "utterance": null,
+    "at": 1786981146.7502315,
+    "history": [
+     {
+      "value": "Open Body Truck",
+      "confidence": 2,
+      "source": "speech",
+      "at": 1786981146.7502315
+     }
+    ],
+    "warnings": []
+   },
+   "quantity": {
+    "value": "200 Ton",
+    "confidence": 3,
+    "source": "llm",
+    "term": "200 tons",
+    "utterance": null,
+    "at": 1786981146.7502315,
+    "history": [
+     {
+      "value": "200 Ton",
+      "confidence": 2,
+      "source": "speech",
+      "at": 1786981146.7502315
+     }
+    ],
+    "warnings": []
+   },
+   "procurementType": {
+    "value": "Public",
+    "confidence": 3,
+    "source": "llm",
+    "term": "Public",
+    "utterance": null,
+    "at": 1786981146.752239,
+    "history": [
+     {
+      "value": "Public",
+      "confidence": 2,
+      "source": "speech",
+      "at": 1786981146.752239
+     }
+    ],
+    "warnings": []
+   },
+   "pickupDate": {
+    "value": "21 Sep 2026",
+    "confidence": 3,
+    "source": "llm",
+    "term": "21 September",
+    "utterance": null,
+    "at": 1786981146.752239,
+    "history": [
+     {
+      "value": "21 Sep 2026",
+      "confidence": 2,
+      "source": "speech",
+      "at": 1786981146.752239
+     }
+    ],
+    "warnings": [
+     "year not stated - assumed 2026"
+    ]
+   },
+   "deliveryDate": {
+    "value": "25 Sep 2026",
+    "confidence": 3,
+    "source": "llm",
+    "term": "25 September",
+    "utterance": null,
+    "at": 1786981146.752239,
+    "history": [
+     {
+      "value": "25 Sep 2026",
+      "confidence": 2,
+      "source": "speech",
+      "at": 1786981146.752239
+     }
+    ],
+    "warnings": [
+     "year not stated - assumed 2026"
+    ]
+   }
+  },
+  "complete": true,
+  "confirmed": false,
+  "missing": []
+ },
+ "plain": {
+  "pickupLocation": "Bengaluru",
+  "deliveryLocation": "Mumbai",
+  "material": "Steel",
+  "quantity": "200 Ton",
+  "vehicleType": "Open Body Truck",
+  "pickupDate": "21 Sep 2026",
+  "deliveryDate": "25 Sep 2026",
+  "procurementType": "Public"
+ },
+ "issues": [],
+ "canConfirm": true,
+ "blockedBy": [],
+ "metrics": {
+  "turns": 2,
+  "avgResponseMs": 0,
+  "slowestMs": 0,
+  "bargeIns": 0,
+  "agentTalkMs": 0,
+  "talkSharePct": 0,
+  "scripts": [
+   "English",
+   "Hindi / Marathi"
+  ],
+  "rows": [
+   {
+    "responseMs": 0,
+    "talkMs": 0,
+    "bargeIn": false
+   },
+   {
+    "responseMs": 0,
+    "talkMs": 0,
+    "bargeIn": false
+   }
+  ]
+ },
+ "transcript": [
+  {
+   "role": "agent",
+   "text": "Namaste, AB Logistics. Load kahan se kahan ja raha hai?",
+   "at": 1786981146.7074404,
+   "language": {
+    "code": "en",
+    "label": "English",
+    "script": "Latin"
+   },
+   "bargeIn": false
+  },
+  {
+   "role": "user",
+   "text": "मेरा पिकअप लोकेशन है बेंगलुरु और डिलीवरी लोकेशन है अंबाला",
+   "at": 1786981146.7452173,
+   "language": {
+    "code": "hi",
+    "label": "Hindi / Marathi",
+    "script": "Devanagari"
+   },
+   "bargeIn": false
+  },
+  {
+   "role": "user",
+   "text": "material steel hai, 200 ton, open body truck chahiye",
+   "at": 1786981146.7492237,
+   "language": {
+    "code": "en",
+    "label": "English",
+    "script": "Latin"
+   },
+   "bargeIn": false
+  },
+  {
+   "role": "user",
+   "text": "pickup 21 September, delivery 25 September, procurement public",
+   "at": 1786981146.7502315,
+   "language": {
+    "code": "en",
+    "label": "English",
+    "script": "Latin"
+   },
+   "bargeIn": false
+  },
+  {
+   "role": "user",
+   "text": "sorry delivery Mumbai hai Ambala nahi",
+   "at": 1786981146.752239,
+   "language": {
+    "code": "en",
+    "label": "English",
+    "script": "Latin"
+   },
+   "bargeIn": false
+  }
+ ]
+}

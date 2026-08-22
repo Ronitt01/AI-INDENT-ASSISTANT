@@ -1,0 +1,34 @@
+:root {
+  --bg: #0a0d13;
+  --panel-bg: #10141c;
+  --panel-border: #232838;
+  --header-bg: #0c0f16;
+  --text: #e6e9ef;
+  --muted: #8b93a7;
+  --dim: #626a7d;
+  --accent: #5b8cff;
+  --green: #22c55e;
+  --amber: #d9a441;
+  --red: #ef4444;
+  --field-bg: #151a24;
+  --field-border: #262b38;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.hidden { display: none !important; }

@@ -1,0 +1,12 @@
+.env
+**/__pycache__/
+*.pyc
+node_modules/
+web/dist/
+phase0_prototype/output/
+livekit-agent/call_logs.sqlite3
+livekit-agent/call_logs.sqlite3-*
+.venv/
+web/node_modules/
+.playwright-mcp/
+*.png

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Indent Assistant — minimal client</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    #status { font-weight: 600; }
+    #transcript { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; height: 320px;
+                  overflow-y: auto; margin-top: 1rem; background: #fafafa; }
+    #transcript p { margin: 0.25rem 0; }
+    #transcript .agent { color: #1a5fb4; }
+    #transcript .driver { color: #26a269; }
+    button { padding: 0.5rem 1rem; margin-right: 0.5rem; }
+    label { display: block; margin: 0.5rem 0; }
+    input { padding: 0.25rem; }
+  </style>
+</head>
+<body>
+  <h1>AB Logistics — Indent Assistant (dev)</h1>
+
+  <label>Driver / user ID <input id="userId" value="driver-test-1" /></label>
+  <label>Order ID <input id="orderId" value="order-test-1" /></label>
+  <label>Token server URL <input id="tokenServerUrl" value="http://localhost:8081" style="width: 260px" /></label>
+
+  <p id="status">disconnected</p>
+  <button id="connectBtn">Connect &amp; start call</button>
+  <button id="micBtn" disabled>Mute</button>
+  <button id="disconnectBtn" disabled>End call</button>
+
+  <div id="transcript"></div>
+
+  <script type="module" src="/simple.js"></script>
+</body>
+</html>

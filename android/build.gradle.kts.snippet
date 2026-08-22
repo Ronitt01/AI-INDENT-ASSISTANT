@@ -1,0 +1,13 @@
+// Add to settings.gradle(.kts), dependencyResolutionManagement { repositories { ... } }:
+//   maven { url = uri("https://jitpack.io") }
+// (alongside your existing google() and mavenCentral())
+
+// Add to your app module's build.gradle(.kts) dependencies block:
+
+dependencies {
+    val livekitVersion = "2.28.0"
+    implementation("io.livekit:livekit-android:$livekitVersion")
+
+    // Only add this if you also need CameraX (not needed for a voice-only call).
+    // implementation("io.livekit:livekit-android-camerax:$livekitVersion")
+}

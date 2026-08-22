@@ -1,0 +1,10 @@
+<!-- Add inside your existing <manifest> tag, alongside whatever Vapi already needed -->
+
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+<!-- Only if a call must survive the app being backgrounded (roadmap Phase 4 note) -->
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
