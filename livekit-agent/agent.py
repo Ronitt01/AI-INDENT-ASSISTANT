@@ -74,6 +74,8 @@ TTS_LANGUAGE_CODE = os.getenv("SARVAM_TTS_LANGUAGE_CODE", os.getenv("SARVAM_LANG
 LLM_MODEL = os.getenv("SARVAM_LLM_MODEL", "sarvam-105b-conversations")
 TTS_SPEAKER = os.getenv("SARVAM_TTS_SPEAKER", "shubh")  # Phase-0 A/B winner goes here
 USE_GROQ_FALLBACK = os.getenv("USE_GROQ_FALLBACK", "false").lower() == "true"
+USE_OPENROUTER = os.getenv("USE_OPENROUTER", "false").lower() == "true"
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "stealth/ox-alpha")
 
 class IndentAssistant(Agent):
     """The conversational agent plus the two tools that fill the indent.
@@ -124,6 +126,25 @@ class IndentAssistant(Agent):
 
 
 def _build_llm():
+    if USE_OPENROUTER:
+        # Same trade as the Groq branch below: OpenRouter fronts providers that are
+        # mostly US-hosted, so the LLM leg leaves India even while STT/TTS stay on
+        # Sarvam. Worth it to try a model Sarvam does not host; watch the LLM TTFT in
+        # the per-call metrics before keeping it.
+        logger.warning(
+            "USE_OPENROUTER=true: LLM leg now routes through OpenRouter (%s) instead of "
+            "Sarvam — the round trip leaves India, so check LLM latency in the call metrics.",
+            OPENROUTER_MODEL,
+        )
+        # with_openrouter reads OPENROUTER_API_KEY itself and sets the OpenRouter
+        # base_url; site_url/app_name are the optional HTTP-Referer / X-Title headers
+        # that put this app on OpenRouter's leaderboards, and are skipped when unset.
+        return lk_openai.LLM.with_openrouter(
+            model=OPENROUTER_MODEL,
+            site_url=os.getenv("OPENROUTER_SITE_URL") or None,
+            app_name=os.getenv("OPENROUTER_APP_NAME") or None,
+        )
+
     if USE_GROQ_FALLBACK:
         from livekit.plugins import groq
 

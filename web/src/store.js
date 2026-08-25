@@ -1,12 +1,23 @@
 // Client state. The agent owns the indent; this holds only what the browser
 // needs to render it and drive the call.
 
-// Where the token server lives. Baked in at build time from VITE_API_BASE so a
-// deployed console talks to a deployed backend; falls back to the local port for
-// `npm run dev`. A hardcoded localhost here is invisible in development and fatal
-// once deployed - the visitor's browser would dial *their own* machine.
-// An operator can still override it per-browser in the settings modal.
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8081";
+// Where the token server lives. Resolved at RUNTIME, not just build time, because a
+// single build has to work in two places:
+//
+//   served from localhost -> the FastAPI token server on :8081
+//   served from anywhere  -> /api/livekit-token, the Vercel function, same origin
+//
+// Same origin is the point: it removes CORS from the deployment entirely, rather
+// than maintaining an allow-list of every host the console might be served from.
+// VITE_API_BASE overrides both, for pointing a deployed console at a token server
+// hosted somewhere other than Vercel.
+function resolveApiBase() {
+  if (import.meta.env.VITE_API_BASE) return import.meta.env.VITE_API_BASE;
+  const local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
+  return local ? "http://localhost:8081" : "/api";
+}
+
+const API_BASE = resolveApiBase();
 
 const DEFAULTS = {
   apiBase: API_BASE,
@@ -22,9 +33,9 @@ function loadSettings() {
     // Drop a saved apiBase that points at a machine this browser is not on. Without
     // this, anyone who ever ran the console locally keeps a localhost apiBase in
     // localStorage and the deployed site silently fails for them alone.
-    if (saved.apiBase && /localhost|127\.0\.0\.1/.test(saved.apiBase)) {
-      if (!/localhost|127\.0\.0\.1/.test(window.location.hostname)) delete saved.apiBase;
-    }
+    const savedIsLocal = /localhost|127\.0\.0\.1/.test(saved.apiBase || "");
+    const pageIsLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
+    if (savedIsLocal && !pageIsLocal) delete saved.apiBase;
     return { ...DEFAULTS, ...saved };
   } catch {
     return { ...DEFAULTS };

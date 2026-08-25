@@ -81,45 +81,69 @@ Then open the web client, allow mic access, and talk to the agent. Android integ
 (`android/`) mirrors the same LiveKit connect/token flow — see its README for merging into
 the existing app.
 
-## Deploying the console
+## Deploying
 
-Only the console is deployable to a static host. The other three components are not,
-and it matters why:
+The console and the token endpoint both deploy to Vercel. The other two components
+cannot, and it is worth being clear why:
 
-| Component | Deploy target | Why not Vercel |
+| Component | Where it runs | Why |
 |---|---|---|
-| `web/` console | **Vercel** (config in [`vercel.json`](vercel.json)) | — |
-| `backend/` token server | any container host | needs to be reachable over HTTPS; could be a serverless function with rework |
-| `livekit-agent/` worker | any container host | a persistent process that joins rooms and holds sockets for the length of a call |
-| LiveKit media server | LiveKit Cloud, or a host with TLS | WebRTC media, not HTTP |
+| `web/` console | **Vercel** static build | — |
+| `api/livekit-token.py` | **Vercel** Python function | same origin as the console, so no CORS at all |
+| LiveKit media server | **LiveKit Cloud** (free tier is enough to start) | WebRTC media, not HTTP. The local `docker compose` server is for development only |
+| `livekit-agent/` worker | anywhere with outbound internet — your machine, or a container host | a persistent process that joins rooms and holds sockets for the length of a call |
 
-The console reads its backend address from `VITE_API_BASE` at **build** time (see
-[`web/.env.example`](web/.env.example)). Vite bakes it into the bundle, so changing it
-needs a rebuild, and it must be a public value — never a secret.
+The worker is the part people expect to be hardest to place, and it is not: it dials
+*out* to LiveKit and waits for jobs, so it needs no inbound port and no public
+address. Running it on a laptop against LiveKit Cloud is a legitimate demo setup.
 
-```bash
-# local
-npm --prefix web run dev                       # falls back to http://localhost:8081
+### 1. LiveKit Cloud
 
-# production build
-VITE_API_BASE=https://tokens.example.com npm --prefix web run build
+Create a project and copy the three values. They replace the `devkey`/`secret` pair
+that only exists for local development.
+
+### 2. Vercel
+
+Import the repo. [`vercel.json`](vercel.json) already supplies the build command,
+output directory, SPA rewrite (which deliberately excludes `/api`) and a
+`microphone=(self)` permissions policy. Set these environment variables:
+
+```
+LIVEKIT_URL           wss://<project>.livekit.cloud
+LIVEKIT_API_KEY       <from LiveKit Cloud>
+LIVEKIT_API_SECRET    <from LiveKit Cloud>
+LIVEKIT_AGENT_NAME    indent-assistant          # optional
+TOKEN_TTL_MINUTES     15                        # optional
+TOKEN_SHARED_SECRET   <a long random string>    # optional, see below
 ```
 
-On Vercel: import the repo, leave the build settings alone (`vercel.json` supplies the
-build command and output directory), and set `VITE_API_BASE` in the project's
-Environment Variables.
+`VITE_API_BASE` is deliberately **not** required. With it unset the console resolves
+its backend at runtime: `http://localhost:8081` when served from localhost, and
+`/api` otherwise. Set it only to point a deployed console at a token server hosted
+somewhere other than Vercel.
 
-### Before you point a public URL at this
+### 3. The agent worker
 
-- **The token endpoint has no authentication.** Anyone who can reach it can mint a join
-  token for any `order_id` and sit in a live driver call. On localhost that is a known
-  gap; on a public URL it is a live one. Wire it to your app's session before deploying.
-- **`VITE_API_BASE` must be HTTPS.** The page is served over HTTPS and the browser
-  blocks plain-HTTP requests from it as mixed content.
-- **`LIVEKIT_URL` must be `wss://`,** which means a TLS-terminated media server. The
-  `--node-ip 127.0.0.1` in [`livekit-agent/docker-compose.yml`](livekit-agent/docker-compose.yml)
-  is exactly what makes local ICE work and exactly what breaks it for everyone else.
-- **Set `ALLOWED_ORIGINS`** on the token server to the deployed console's origin.
+Point it at the same LiveKit Cloud project and run it:
+
+```bash
+cd livekit-agent
+LIVEKIT_URL=wss://<project>.livekit.cloud LIVEKIT_API_KEY=... LIVEKIT_API_SECRET=... ../.venv/Scripts/python agent.py dev      # `start` for a long-running deployment
+```
+
+Without a worker registered, a caller connects to a room and hears nothing: the
+token endpoint creates the dispatch, but there is nobody to accept it.
+
+### Before a public URL points at this
+
+- **Authentication.** The token endpoint mints a join token for any `order_id` it is
+  given. `TOKEN_SHARED_SECRET` adds a single shared header check — enough to stop a
+  drive-by, not enough for production, because every caller holds the same string.
+  Wire it to your app's session before real drivers use it.
+- **Token lifetime** defaults to 15 minutes rather than the SDK's several hours. A
+  leaked token is only interesting while it is valid.
+- **`ALLOWED_ORIGINS`** only matters for the local FastAPI server. The Vercel function
+  is same-origin and needs no allow-list — which is the main reason it exists.
 
 ## Languages
 
@@ -158,6 +182,33 @@ change; there is no hot-reload.
 `--voice-ab` ignores this deliberately — it sweeps `CANDIDATE_SPEAKERS` in
 `phase0_prototype/test_phrases.py`, which is the list you A/B *to decide* what to put in
 `.env`. `SARVAM_LANGUAGE_CODE` and `SARVAM_LLM_MODEL` work the same way.
+
+## Changing the LLM
+
+By default the LLM leg is Sarvam's own `sarvam-105b-conversations`, in the same region
+as STT and TTS. Two `.env` switches move it elsewhere, and `agent.py::_build_llm()`
+checks them in this order:
+
+```
+USE_OPENROUTER=true
+OPENROUTER_API_KEY=sk-or-v1-...
+OPENROUTER_MODEL=stealth/ox-alpha
+```
+
+```
+USE_GROQ_FALLBACK=true
+GROQ_API_KEY=...
+```
+
+Both leave India for the LLM round trip while STT/TTS stay on Sarvam, so they cost
+latency — the agent logs a warning at startup and the per-call metrics show the LLM
+TTFT. Check that number before keeping either.
+
+Whatever you pick **must support tool calling**: the indent is filled by the model
+calling `upsert_indent`, so a model without tools produces an empty indent no matter how
+well it talks. `OPENROUTER_SITE_URL` / `OPENROUTER_APP_NAME` are optional and only set
+OpenRouter's `HTTP-Referer` / `X-Title` leaderboard headers. Restart the agent to pick
+up a change.
 
 ## What's NOT done for you (and can't be, from here)
 
